@@ -1,6 +1,7 @@
 package gui;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -36,7 +37,12 @@ public class SellerListController implements Initializable, DataChangeListener {
 	private TableColumn<Seller, Integer> tableColumnId;
 	@FXML
 	private TableColumn<Seller, String> tableColumnName;
-
+	@FXML
+	private TableColumn<Seller, String> tableColumnEmail;
+	@FXML
+	private TableColumn<Seller, Date> tableColumnBirthDate;
+	@FXML
+	private TableColumn<Seller, Double> tableColumnBaseSalary;
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnEDIT;
 	@FXML
@@ -50,14 +56,13 @@ public class SellerListController implements Initializable, DataChangeListener {
 	public void onBtNewAction(ActionEvent event) {
 		Stage parentStage = utils.currentStage(event);
 		Seller obj = new Seller();
-		
 
 	}
 
 	public void setSellerService(SellerService service) {
 		this.service = service;
 	}
-	
+
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		initializeNodes();
@@ -67,7 +72,12 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
-
+		tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+		tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+		utils.formatTableColumnDate(tableColumnBirthDate, "dd/MM/yyyy");
+		tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+		utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
+		
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewSeller.prefHeightProperty().bind(stage.heightProperty());
 	}
@@ -128,7 +138,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 					return;
 				}
 				setGraphic(button);
-				
+
 			}
 		});
 	}
@@ -149,23 +159,23 @@ public class SellerListController implements Initializable, DataChangeListener {
 				button.setOnAction(event -> removeEntity(obj));
 			}
 
-			
-		});}
-	
+		});
+	}
+
 	private void removeEntity(Seller obj) {
 		Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "are you sure to delete the object?");
-	
-		if(result.get() == ButtonType.OK) {
-		    if(service == null) {
-		    	throw new IllegalStateException("Service was null");
-		    }
-		    try {
-			service.remove(obj);
-		    updateTableView();
-		    }catch(DbIntegrityException e) {
-		    	Alerts.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
-		    }
-	    }
+
+		if (result.get() == ButtonType.OK) {
+			if (service == null) {
+				throw new IllegalStateException("Service was null");
+			}
+			try {
+				service.remove(obj);
+				updateTableView();
+			} catch (DbIntegrityException e) {
+				Alerts.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
+			}
+		}
 	}
-	
+
 }
